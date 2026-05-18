@@ -107,7 +107,7 @@ const CHAPTERS = [
 ];
 
 // ── markdown-it 設定 ─────────────────────────────────────────
-const md = window.markdownit({ html: false, linkify: false, typographer: false });
+const mdParser = window.markdownit({ html: false, linkify: false, typographer: false });
 
 // ── 建立 tab 骨架 ─────────────────────────────────────────────
 const tabBar     = document.getElementById('tabBar');
@@ -155,13 +155,13 @@ function renderMarkdown(pane, md) {
 
   const hotIdx = md.indexOf('# 🔥 速背重點整理');
   if (hotIdx !== -1) {
-    body.innerHTML = md.render(md.substring(0, hotIdx));
+    body.innerHTML = mdParser.render(md.substring(0, hotIdx));
     const hotDiv = document.createElement('div');
     hotDiv.className = 'hot-section';
-    hotDiv.innerHTML = md.render(md.substring(hotIdx));
+    hotDiv.innerHTML = mdParser.render(md.substring(hotIdx));
     body.appendChild(hotDiv);
   } else {
-    body.innerHTML = md.render(md);
+    body.innerHTML = mdParser.render(md);
   }
 
   pane.innerHTML = '';
