@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System &amp; Process 考前複習</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --tab-h: 52px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  .site-header { background: var(--primary); color: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .site-header h1 { font-size: 1.25rem; font-weight: 700; }
+  .site-header p { font-size: .85rem; opacity: .8; margin-top: 2px; }
+
+  .tab-bar { position: sticky; top: 0; z-index: 100; background: var(--surface); border-bottom: 2px solid var(--border); display: flex; overflow-x: auto; }
+  .tab-btn {
+    flex: 1; min-width: 120px; height: var(--tab-h); border: none; background: none;
+    cursor: pointer; font-size: .9rem; font-weight: 600; color: var(--text-muted);
+    border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap; padding: 0 20px;
+  }
+  .tab-btn:hover { color: var(--primary); background: var(--primary-light); }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  .tab-pane { display: none; max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  .tab-pane.active { display: block; }
+
+  .search-bar { position: sticky; top: var(--tab-h); z-index: 90; background: var(--bg); padding: 10px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
+  .search-bar input {
+    flex: 1; max-width: 400px; padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: .9rem; outline: none;
+  }
+  .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  .search-bar label { font-size: .85rem; color: var(--text-muted); }
+  mark { background: #fef08a; border-radius: 2px; }
+
+  .loading { text-align: center; padding: 60px 0; color: var(--text-muted); }
+  .error-msg { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; padding: 16px 20px; border-radius: 8px; margin: 20px 0; font-size: .9rem; line-height: 1.8; }
+  .error-msg code { background: #fee2e2; padding: 2px 6px; border-radius: 4px; }
+
+  .md-body h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 20px; color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
+  .md-body h2 { font-size: 1.3rem; font-weight: 700; margin: 36px 0 14px; color: #1e40af; border-left: 4px solid var(--primary); padding-left: 12px; }
+  .md-body h3 { font-size: 1.05rem; font-weight: 700; margin: 24px 0 10px; color: #334155; }
+  .md-body h4 { font-size: .95rem; font-weight: 700; margin: 18px 0 8px; color: #475569; }
+  .md-body p { margin: 10px 0; }
+  .md-body ul, .md-body ol { padding-left: 22px; margin: 8px 0; }
+  .md-body li { margin: 4px 0; }
+  .md-body blockquote { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 10px 16px; margin: 12px 0; border-radius: 0 6px 6px 0; font-size: .9rem; color: #92400e; }
+  .md-body hr { border: none; border-top: 2px solid var(--border); margin: 28px 0; }
+  .md-body code:not(pre code) { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: .85em; font-family: "Fira Code", "Cascadia Code", monospace; color: #be185d; }
+  .md-body pre { background: #1e293b; border-radius: 8px; padding: 16px; overflow-x: auto; margin: 14px 0; }
+  .md-body pre code { background: none; color: #e2e8f0; font-size: .84rem; font-family: "Fira Code", "Cascadia Code", monospace; padding: 0; }
+  .md-body table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .88rem; }
+  .md-body table th { background: #1e40af; color: white; padding: 8px 12px; text-align: left; font-weight: 600; }
+  .md-body table td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
+  .md-body table tr:nth-child(even) td { background: var(--primary-light); }
+  .md-body table tr:hover td { background: #bfdbfe; }
+  .md-body strong { color: #0f172a; }
+  .md-body a { color: var(--primary); text-decoration: none; }
+  .md-body a:hover { text-decoration: underline; }
+
+  .hot-section { background: linear-gradient(135deg, #fff7ed, #fef3c7); border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 24px 0; }
+  .hot-section h1, .hot-section h2 { color: #92400e !important; border-color: #f59e0b !important; }
+
+  .back-top { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; background: var(--primary); color: white; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,.4); display: none; align-items: center; justify-content: center; }
+  .back-top.show { display: flex; }
+  .back-top:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <h1>📚 System &amp; Process 考前複習</h1>
+  <p>Assembly Language — CH1~CH4</p>
+</div>
+
+<div class="tab-bar" id="tabBar"></div>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="🔍 在當前章節中搜尋關鍵字..." oninput="doSearch()">
+  <label id="searchHint"></label>
+</div>
+
+<div id="tabContent"></div>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+// ── 章節設定：新增章節只需在這裡加一行 ──────────────────────
+const CHAPTERS = [
+  { title: 'CH1 Basic Concepts',  file: 'textbooks/c1_basic_concepts_notes.md' },
+  { title: 'CH2 AL Fundamentals', file: 'textbooks/c2_assembly_language_fundamentals_notes.md' },
+  { title: 'CH3 Data Transfers',  file: 'textbooks/c3_data_transfers_addressing_arithmetic_notes.md' },
+  { title: 'CH4 Procedures',      file: 'textbooks/c4_procedures_notes.md' },
+];
+
+// ── marked 設定 ───────────────────────────────────────────────
+marked.setOptions({ breaks: false, gfm: true });
+
+const renderer = new marked.Renderer();
+renderer.code = function(code, lang) {
+  const highlighted = (lang && hljs.getLanguage(lang))
+    ? hljs.highlight(code, { language: lang }).value
+    : hljs.highlightAuto(code).value;
+  return `<pre><code class="hljs">${highlighted}</code></pre>`;
+};
+marked.use({ renderer });
+
+// ── 建立 tab 骨架 ─────────────────────────────────────────────
+const tabBar     = document.getElementById('tabBar');
+const tabContent = document.getElementById('tabContent');
+
+CHAPTERS.forEach((ch, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+  btn.textContent = ch.title;
+  btn.addEventListener('click', () => switchTab(i));
+  tabBar.appendChild(btn);
+
+  const pane = document.createElement('div');
+  pane.className = 'tab-pane' + (i === 0 ? ' active' : '');
+  pane.id = `pane-${i}`;
+  pane.innerHTML = '<div class="loading">載入中…</div>';
+  tabContent.appendChild(pane);
+});
+
+// ── fetch + 渲染 ──────────────────────────────────────────────
+async function loadChapter(idx) {
+  const pane = document.getElementById(`pane-${idx}`);
+  if (pane.dataset.loaded) return;
+
+  try {
+    const res = await fetch(CHAPTERS[idx].file);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const md = await res.text();
+    renderMarkdown(pane, md);
+    pane.dataset.loaded = '1';
+  } catch (err) {
+    pane.innerHTML = `
+      <div class="error-msg">
+        <strong>無法載入：</strong><code>${CHAPTERS[idx].file}</code><br><br>
+        請透過 HTTP server 開啟此頁面：<br>
+        <code>npx serve .</code> 或 VS Code Live Server<br><br>
+        錯誤：${err.message}
+      </div>`;
+  }
+}
+
+function renderMarkdown(pane, md) {
+  const body = document.createElement('div');
+  body.className = 'md-body';
+
+  const hotIdx = md.indexOf('# 🔥 速背重點整理');
+  if (hotIdx !== -1) {
+    body.innerHTML = marked.parse(md.substring(0, hotIdx));
+    const hotDiv = document.createElement('div');
+    hotDiv.className = 'hot-section';
+    hotDiv.innerHTML = marked.parse(md.substring(hotIdx));
+    body.appendChild(hotDiv);
+  } else {
+    body.innerHTML = marked.parse(md);
+  }
+
+  pane.innerHTML = '';
+  pane.appendChild(body);
+}
+
+// ── tab 切換 ──────────────────────────────────────────────────
+function switchTab(idx) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.querySelectorAll('.tab-pane').forEach((p, i) => p.classList.toggle('active', i === idx));
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchHint').textContent = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  loadChapter(idx);
+}
+
+// ── 搜尋 ──────────────────────────────────────────────────────
+function doSearch() {
+  const keyword = document.getElementById('searchInput').value.trim();
+  const activePane = document.querySelector('.tab-pane.active');
+  const idx = [...document.querySelectorAll('.tab-pane')].indexOf(activePane);
+  clearHighlights(idx);
+  if (!keyword) { document.getElementById('searchHint').textContent = ''; return; }
+  const count = highlightKeyword(activePane, keyword);
+  document.getElementById('searchHint').textContent = `找到 ${count} 處`;
+  const first = activePane.querySelector('mark');
+  if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearHighlights(idx) {
+  const pane = document.getElementById(`pane-${idx}`);
+  if (!pane) return;
+  pane.querySelectorAll('mark').forEach(m => {
+    m.parentNode.replaceChild(document.createTextNode(m.textContent), m);
+    m.parentNode.normalize();
+  });
+}
+
+function highlightKeyword(container, keyword) {
+  const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+
+  let count = 0;
+  nodes.forEach(node => {
+    const tag = node.parentNode.tagName;
+    if (!node.nodeValue.trim() || tag === 'SCRIPT' || tag === 'STYLE') return;
+    const re = new RegExp(escape(keyword), 'gi');
+    const matches = node.nodeValue.match(re);
+    if (!matches) return;
+    count += matches.length;
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    const re2 = new RegExp(escape(keyword), 'gi');
+    while ((m = re2.exec(node.nodeValue)) !== null) {
+      frag.appendChild(document.createTextNode(node.nodeValue.slice(last, m.index)));
+      const mark = document.createElement('mark');
+      mark.textContent = m[0];
+      frag.appendChild(mark);
+      last = m.index + m[0].length;
+    }
+    frag.appendChild(document.createTextNode(node.nodeValue.slice(last)));
+    node.parentNode.replaceChild(frag, node);
+  });
+  return count;
+}
+
+// ── 回到頂部 ──────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('backTop').classList.toggle('show', window.scrollY > 300);
+});
+
+// ── 初始載入 ──────────────────────────────────────────────────
+loadChapter(0);
+</script>
+</body>
+</html>
