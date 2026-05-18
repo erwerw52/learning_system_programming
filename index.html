@@ -35,14 +35,6 @@
   .tab-pane { display: none; max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
   .tab-pane.active { display: block; }
 
-  .search-bar { position: sticky; top: var(--tab-h); z-index: 90; background: var(--bg); padding: 10px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
-  .search-bar input {
-    flex: 1; max-width: 400px; padding: 8px 14px; border: 1px solid var(--border);
-    border-radius: 8px; font-size: .9rem; outline: none;
-  }
-  .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-  .search-bar label { font-size: .85rem; color: var(--text-muted); }
-  mark { background: #fef08a; border-radius: 2px; }
 
   .loading { text-align: center; padding: 60px 0; color: var(--text-muted); }
   .error-msg { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; padding: 16px 20px; border-radius: 8px; margin: 20px 0; font-size: .9rem; line-height: 1.8; }
@@ -86,10 +78,6 @@
 
 <div class="tab-bar" id="tabBar"></div>
 
-<div class="search-bar">
-  <input type="text" id="searchInput" placeholder="🔍 在當前章節中搜尋關鍵字..." oninput="doSearch()">
-  <label id="searchHint"></label>
-</div>
 
 <div id="tabContent"></div>
 
@@ -187,63 +175,8 @@ function renderMarkdown(pane, md) {
 function switchTab(idx) {
   document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
   document.querySelectorAll('.tab-pane').forEach((p, i) => p.classList.toggle('active', i === idx));
-  document.getElementById('searchInput').value = '';
-  document.getElementById('searchHint').textContent = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadChapter(idx);
-}
-
-// ── 搜尋 ──────────────────────────────────────────────────────
-function doSearch() {
-  const keyword = document.getElementById('searchInput').value.trim();
-  const activePane = document.querySelector('.tab-pane.active');
-  const idx = [...document.querySelectorAll('.tab-pane')].indexOf(activePane);
-  clearHighlights(idx);
-  if (!keyword) { document.getElementById('searchHint').textContent = ''; return; }
-  const count = highlightKeyword(activePane, keyword);
-  document.getElementById('searchHint').textContent = `找到 ${count} 處`;
-  const first = activePane.querySelector('mark');
-  if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function clearHighlights(idx) {
-  const pane = document.getElementById(`pane-${idx}`);
-  if (!pane) return;
-  pane.querySelectorAll('mark').forEach(m => {
-    m.parentNode.replaceChild(document.createTextNode(m.textContent), m);
-    m.parentNode.normalize();
-  });
-}
-
-function highlightKeyword(container, keyword) {
-  const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  let n;
-  while ((n = walker.nextNode())) nodes.push(n);
-
-  let count = 0;
-  nodes.forEach(node => {
-    const tag = node.parentNode.tagName;
-    if (!node.nodeValue.trim() || tag === 'SCRIPT' || tag === 'STYLE') return;
-    const re = new RegExp(escape(keyword), 'gi');
-    const matches = node.nodeValue.match(re);
-    if (!matches) return;
-    count += matches.length;
-    const frag = document.createDocumentFragment();
-    let last = 0, m;
-    const re2 = new RegExp(escape(keyword), 'gi');
-    while ((m = re2.exec(node.nodeValue)) !== null) {
-      frag.appendChild(document.createTextNode(node.nodeValue.slice(last, m.index)));
-      const mark = document.createElement('mark');
-      mark.textContent = m[0];
-      frag.appendChild(mark);
-      last = m.index + m[0].length;
-    }
-    frag.appendChild(document.createTextNode(node.nodeValue.slice(last)));
-    node.parentNode.replaceChild(frag, node);
-  });
-  return count;
 }
 
 // ── 回到頂部 ──────────────────────────────────────────────────
