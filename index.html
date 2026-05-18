@@ -48,10 +48,10 @@
   .error-msg { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; padding: 16px 20px; border-radius: 8px; margin: 20px 0; font-size: .9rem; line-height: 1.8; }
   .error-msg code { background: #fee2e2; padding: 2px 6px; border-radius: 4px; }
 
-  .md-body h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 20px; color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
-  .md-body h2 { font-size: 1.3rem; font-weight: 700; margin: 36px 0 14px; color: #1e40af; border-left: 4px solid var(--primary); padding-left: 12px; }
-  .md-body h3 { font-size: 1.05rem; font-weight: 700; margin: 24px 0 10px; color: #334155; }
-  .md-body h4 { font-size: .95rem; font-weight: 700; margin: 18px 0 8px; color: #475569; }
+  .md-body h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 20px; color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; scroll-margin-top: 110px; }
+  .md-body h2 { font-size: 1.3rem; font-weight: 700; margin: 36px 0 14px; color: #1e40af; border-left: 4px solid var(--primary); padding-left: 12px; scroll-margin-top: 110px; }
+  .md-body h3 { font-size: 1.05rem; font-weight: 700; margin: 24px 0 10px; color: #334155; scroll-margin-top: 110px; }
+  .md-body h4 { font-size: .95rem; font-weight: 700; margin: 18px 0 8px; color: #475569; scroll-margin-top: 110px; }
   .md-body p { margin: 10px 0; }
   .md-body ul, .md-body ol { padding-left: 22px; margin: 8px 0; }
   .md-body li { margin: 4px 0; }
@@ -108,6 +108,20 @@ const CHAPTERS = [
 
 // ── markdown-it 設定 ─────────────────────────────────────────
 const mdParser = window.markdownit({ html: false, linkify: false, typographer: false });
+
+function githubSlugify(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^\w一-鿿㐀-䶿\s-]/g, '')
+    .replace(/\s+/g, '-');
+}
+
+mdParser.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
+  const titleToken = tokens[idx + 1];
+  const title = titleToken.children.map(t => t.content).join('');
+  tokens[idx].attrSet('id', githubSlugify(title));
+  return self.renderToken(tokens, idx, options);
+};
 
 // ── 建立 tab 骨架 ─────────────────────────────────────────────
 const tabBar     = document.getElementById('tabBar');
