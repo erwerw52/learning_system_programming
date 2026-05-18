@@ -96,7 +96,7 @@
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 <script>
 // ── 章節設定：新增章節只需在這裡加一行 ──────────────────────
 const CHAPTERS = [
@@ -106,8 +106,8 @@ const CHAPTERS = [
   { title: 'CH4 Procedures',      file: 'textbooks/c4_procedures_notes.md' },
 ];
 
-// ── marked 設定 ───────────────────────────────────────────────
-marked.use({ breaks: false, gfm: true });
+// ── markdown-it 設定 ─────────────────────────────────────────
+const md = window.markdownit({ html: false, linkify: false, typographer: false });
 
 // ── 建立 tab 骨架 ─────────────────────────────────────────────
 const tabBar     = document.getElementById('tabBar');
@@ -155,13 +155,13 @@ function renderMarkdown(pane, md) {
 
   const hotIdx = md.indexOf('# 🔥 速背重點整理');
   if (hotIdx !== -1) {
-    body.innerHTML = marked.parse(md.substring(0, hotIdx));
+    body.innerHTML = md.render(md.substring(0, hotIdx));
     const hotDiv = document.createElement('div');
     hotDiv.className = 'hot-section';
-    hotDiv.innerHTML = marked.parse(md.substring(hotIdx));
+    hotDiv.innerHTML = md.render(md.substring(hotIdx));
     body.appendChild(hotDiv);
   } else {
-    body.innerHTML = marked.parse(md);
+    body.innerHTML = md.render(md);
   }
 
   pane.innerHTML = '';
