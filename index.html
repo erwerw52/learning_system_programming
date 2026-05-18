@@ -96,7 +96,7 @@
 <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@4/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 // ── 章節設定：新增章節只需在這裡加一行 ──────────────────────
 const CHAPTERS = [
@@ -107,16 +107,7 @@ const CHAPTERS = [
 ];
 
 // ── marked 設定 ───────────────────────────────────────────────
-marked.setOptions({ breaks: false, gfm: true });
-
-const renderer = new marked.Renderer();
-renderer.code = function(code, lang) {
-  const highlighted = (lang && hljs.getLanguage(lang))
-    ? hljs.highlight(code, { language: lang }).value
-    : hljs.highlightAuto(code).value;
-  return `<pre><code class="hljs">${highlighted}</code></pre>`;
-};
-marked.use({ renderer });
+marked.use({ breaks: false, gfm: true });
 
 // ── 建立 tab 骨架 ─────────────────────────────────────────────
 const tabBar     = document.getElementById('tabBar');
@@ -175,6 +166,7 @@ function renderMarkdown(pane, md) {
 
   pane.innerHTML = '';
   pane.appendChild(body);
+  pane.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
 }
 
 // ── tab 切換 ──────────────────────────────────────────────────
