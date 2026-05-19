@@ -9,7 +9,7 @@
 2. [資料表示法 Data Representation](#二資料表示法-data-representation)
 3. [布林運算 Boolean Operations](#三布林運算-boolean-operations)
 4. [x86 處理器架構](#四x86-處理器架構)
-5. [速背重點整理](#速背重點整理)
+5. [章節重點](#五章節重點)
 
 ---
 
@@ -586,7 +586,7 @@ EIP = 1009
 
 ---
 
-## 五、Summary（章節重點）
+## 五、章節重點
 1. 組合語言幫助你理解軟體的 **最底層（lowest level）** 是如何構造的。
 2. 組合語言與機器語言是 **one-to-one** 的關係。
 3. Boolean expressions 是設計電腦軟硬體的基礎。
