@@ -100,9 +100,12 @@ const mdParser = window.markdownit({ html: false, linkify: false, typographer: f
 
 function githubSlugify(str) {
   return str
+    .replace(/（[一-鿿㐀-䶿\s]+）/g, '') // 括號內純中文 → 整段移除
+    .replace(/[（）]/g, '')                               // 剩餘全形括號符號移除（保留內容）
     .toLowerCase()
-    .replace(/[^\w一-鿿㐀-䶿\s-]/g, '')
-    .replace(/\s+/g, '-');
+    .replace(/[^\w一-鿿㐀-䶿\s-]/g, '') // 移除標點、emoji 等雜訊
+    .replace(/\s+/g, '-')
+    .replace(/^-+|-+$/g, '');                            // 去掉頭尾多餘的 -
 }
 
 mdParser.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
