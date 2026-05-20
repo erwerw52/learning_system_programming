@@ -99,13 +99,15 @@ const CHAPTERS = [
 const mdParser = window.markdownit({ html: false, linkify: false, typographer: false });
 
 function githubSlugify(str) {
+  // CJK Unified Ideographs: 一-鿿 + Extension A: 㐀-䶿
+  const cjk = '\\u4e00-\\u9fff\\u3400-\\u4dbf';
   return str
-    .replace(/（[一-鿿㐀-䶿\s]+）/g, '') // 括號內純中文 → 整段移除
-    .replace(/[（）]/g, '')                               // 剩餘全形括號符號移除（保留內容）
+    .replace(new RegExp('（[' + cjk + '\\s]+）', 'g'), '')  // 括號內純中文 → 整段移除
+    .replace(/[（）]/g, '')                                   // 剩餘全形括號符號移除（保留內容）
     .toLowerCase()
-    .replace(/[^\w一-鿿㐀-䶿\s-]/g, '') // 移除標點、emoji 等雜訊
+    .replace(new RegExp('[^\\w' + cjk + '\\s-]', 'g'), '')  // 移除標點、emoji 等雜訊
     .replace(/\s+/g, '-')
-    .replace(/^-+|-+$/g, '');                            // 去掉頭尾多餘的 -
+    .replace(/^-+|-+$/g, '');                                // 去掉頭尾多餘的 -
 }
 
 mdParser.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
