@@ -175,6 +175,23 @@ function renderMarkdown(pane, md) {
   pane.innerHTML = '';
   pane.appendChild(body);
   pane.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+  bindAnchorLinks(pane);
+}
+
+// ── 錨點連結攔截：限定在當前 active pane 內搜尋，解決跨章節重複 ID 問題 ──
+function bindAnchorLinks(pane) {
+  pane.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      // markdown-it 可能對 href 做 URL encode，先 decode 回原始字串
+      const hash = decodeURIComponent(this.getAttribute('href').slice(1));
+      const activePane = document.querySelector('.tab-pane.active');
+      const target = activePane.querySelector('[id="' + CSS.escape(hash) + '"]');
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
 }
 
 // ── tab 切換 ──────────────────────────────────────────────────
