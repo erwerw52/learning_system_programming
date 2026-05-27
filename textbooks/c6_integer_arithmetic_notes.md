@@ -4,6 +4,18 @@
 
 ---
 
+## 📚 目錄
+1. [邏輯移位 vs 算術移位](#一邏輯移位-vs-算術移位logical-vs-arithmetic-shifts)
+2. [SHL 指令（邏輯左移）](#二shl-指令shift-left邏輯左移)
+3. [SHR 指令（邏輯右移）](#三shr-指令shift-right邏輯右移)
+4. [SAL 與 SAR 指令（算術移位）](#四sal-與-sar-指令算術移位)
+5. [ROL 指令（向左旋轉）](#五rol-指令rotate-left向左旋轉)
+6. [ROR 指令（向右旋轉）](#六ror-指令rotate-right向右旋轉)
+7. [移位與旋轉的應用](#七移位與旋轉的應用applications)
+8. [速背重點整理](#速背重點整理)
+
+---
+
 ## 大綱（Outline）
 
 1. **Shift and Rotate Instructions（移位與旋轉指令）**
