@@ -8,37 +8,95 @@
 <style>
   :root {
     --primary: #2563eb;
+    --primary-dark: #1d4ed8;
     --primary-light: #dbeafe;
     --bg: #f8fafc;
     --surface: #ffffff;
     --border: #e2e8f0;
     --text: #1e293b;
     --text-muted: #64748b;
-    --tab-h: 52px;
+    --nav-h: 52px;
     --header-h: 92px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding-top: var(--header-h); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    padding-top: var(--header-h);
+  }
+  code, pre { font-family: "Fira Code", "Cascadia Code", Consolas, monospace; }
 
-  .site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 150; background: var(--primary); color: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  /* ── Header ── */
+  .site-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 150;
+    background: var(--primary); color: white; padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .header-text { flex: 1; min-width: 0; }
   .site-header h1 { font-size: 1.25rem; font-weight: 700; }
   .site-header p { font-size: .85rem; opacity: .8; margin-top: 2px; }
-
-  .tab-bar { position: sticky; top: var(--header-h); z-index: 100; background: var(--surface); border-bottom: 2px solid var(--border); display: flex; overflow-x: auto; }
-  .tab-btn {
-    flex: 1; min-width: 120px; height: var(--tab-h); border: none; background: none;
-    cursor: pointer; font-size: .9rem; font-weight: 600; color: var(--text-muted);
-    border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap; padding: 0 20px;
+  .hamburger {
+    display: none; align-items: center; justify-content: center;
+    width: 40px; height: 40px; background: rgba(255,255,255,.15);
+    border: none; border-radius: 8px; color: white; font-size: 1.3rem;
+    cursor: pointer; flex-shrink: 0;
   }
-  .tab-btn:hover { color: var(--primary); background: var(--primary-light); }
-  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .hamburger:hover { background: rgba(255,255,255,.25); }
 
-  .tab-pane { display: none; max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
-  .tab-pane.active { display: block; }
+  /* ── Nav bar ── */
+  .nav-wrap {
+    position: sticky; top: var(--header-h); z-index: 100;
+    background: var(--surface); border-bottom: 2px solid var(--border);
+  }
+  .nav-inner { max-width: 940px; margin: 0 auto; display: flex; }
 
+  .nav-group { position: relative; }
 
-  .loading { text-align: center; padding: 60px 0; color: var(--text-muted); }
-  .error-msg { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; padding: 16px 20px; border-radius: 8px; margin: 20px 0; font-size: .9rem; line-height: 1.8; }
+  .nav-btn {
+    height: var(--nav-h); border: none; background: none; cursor: pointer;
+    font-size: .9rem; font-weight: 600; color: var(--text-muted);
+    border-bottom: 3px solid transparent; transition: all .2s;
+    padding: 0 28px; display: flex; align-items: center; gap: 8px;
+    font-family: inherit; white-space: nowrap;
+  }
+  .nav-btn:hover { color: var(--primary); background: var(--primary-light); }
+  .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .nav-btn .chevron { font-size: .68rem; opacity: .7; transition: transform .2s; }
+  .nav-group.open .nav-btn .chevron { transform: rotate(180deg); }
+
+  .nav-dropdown {
+    position: absolute; top: 100%; left: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-top: none; border-radius: 0 0 10px 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.1);
+    min-width: 210px; padding: 6px 0;
+    opacity: 0; pointer-events: none; transform: translateY(-4px);
+    transition: opacity .18s, transform .18s;
+  }
+  .nav-group.open .nav-dropdown { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+  .dd-item {
+    display: block; width: 100%; text-align: left;
+    padding: 10px 18px; border: none; background: none; cursor: pointer;
+    font-size: .88rem; font-weight: 500; color: var(--text);
+    border-left: 3px solid transparent; transition: all .15s; font-family: inherit;
+  }
+  .dd-item:hover { background: var(--primary-light); color: var(--primary); }
+  .dd-item.active {
+    color: var(--primary); border-left-color: var(--primary);
+    background: var(--primary-light); font-weight: 700;
+  }
+
+  /* ── Content ── */
+  #contentPane { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  .loading { text-align: center; padding: 60px 0; color: var(--text-muted); font-size: 1rem; }
+  .error-msg {
+    background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c;
+    padding: 16px 20px; border-radius: 8px; margin: 20px 0;
+    font-size: .9rem; line-height: 1.8;
+  }
   .error-msg code { background: #fee2e2; padding: 2px 6px; border-radius: 4px; }
 
   .md-body h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 20px; color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; scroll-margin-top: 136px; }
@@ -50,9 +108,9 @@
   .md-body li { margin: 4px 0; }
   .md-body blockquote { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 10px 16px; margin: 12px 0; border-radius: 0 6px 6px 0; font-size: .9rem; color: #92400e; }
   .md-body hr { border: none; border-top: 2px solid var(--border); margin: 28px 0; }
-  .md-body code:not(pre code) { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: .85em; font-family: "Fira Code", "Cascadia Code", monospace; color: #be185d; }
+  .md-body code:not(pre code) { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: .85em; color: #be185d; }
   .md-body pre { background: #1e293b; border-radius: 8px; padding: 16px; overflow-x: auto; margin: 14px 0; }
-  .md-body pre code { background: none; color: #e2e8f0; font-size: .84rem; font-family: "Fira Code", "Cascadia Code", monospace; padding: 0; }
+  .md-body pre code { background: none; color: #ffffff; font-size: .84rem; padding: 0; }
   .md-body table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .88rem; }
   .md-body table th { background: #1e40af; color: white; padding: 8px 12px; text-align: left; font-weight: 600; }
   .md-body table td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
@@ -62,40 +120,149 @@
   .md-body a { color: var(--primary); text-decoration: none; }
   .md-body a:hover { text-decoration: underline; }
 
-  .hot-section { background: linear-gradient(135deg, #fff7ed, #fef3c7); border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 24px 0; }
+  .hot-section { background: linear-gradient(135deg,#fff7ed,#fef3c7); border: 1px solid #fcd34d; border-radius: 10px; padding: 20px 24px; margin: 24px 0; }
   .hot-section h1, .hot-section h2 { color: #92400e !important; border-color: #f59e0b !important; }
 
-  .back-top { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; background: var(--primary); color: white; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,.4); display: none; align-items: center; justify-content: center; }
-  .back-top.show { display: flex; }
-  .back-top:hover { background: #1d4ed8; }
+  /* ── Test: toolbar ── */
+  .test-toolbar {
+    position: sticky;
+    top: calc(var(--header-h) + var(--nav-h));
+    z-index: 50;
+    background: var(--bg);
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 0 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .expand-all-btn {
+    font-size: .85rem; font-weight: 600;
+    background: var(--surface); color: var(--primary);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 16px; cursor: pointer;
+    transition: all .18s; white-space: nowrap; font-family: inherit;
+  }
+  .expand-all-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+  .expand-all-btn.on { background: var(--primary); color: white; border-color: var(--primary); }
 
-  /* ── Hamburger button（桌面隱藏） ─────────────────────────── */
-  .hamburger { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(255,255,255,.15); border: none; border-radius: 8px; color: white; font-size: 1.3rem; cursor: pointer; flex-shrink: 0; }
-  .hamburger:hover { background: rgba(255,255,255,.25); }
+  /* ── Test: question card ── */
+  .q-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px; margin: 0 0 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    transition: box-shadow .2s, border-color .2s;
+  }
+  .q-card:hover { box-shadow: 0 4px 14px rgba(37,99,235,.08); border-color: #cbd5e1; }
+  .q-card .md-body h3 { margin-top: 0; }
 
-  /* ── Drawer overlay ───────────────────────────────────────── */
-  .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+  /* ── Test: answer toggle button ── */
+  .ans-toggle {
+    display: inline-flex; align-items: center; gap: 7px;
+    margin-top: 14px;
+    font-size: .82rem; font-weight: 600;
+    background: white; border: 1px solid var(--primary);
+    color: var(--primary); border-radius: 8px;
+    padding: 7px 14px; cursor: pointer;
+    transition: all .18s; font-family: inherit;
+  }
+  .ans-toggle:hover { background: var(--primary-light); }
+  .ans-toggle.open { background: var(--primary); color: white; }
+  .ans-toggle .t-arrow { display: inline-block; transition: transform .2s; }
+  .ans-toggle.open .t-arrow { transform: rotate(90deg); }
+
+  /* ── Test: answer body ── */
+  .ans-body {
+    display: none;
+    margin-top: 12px; padding: 14px 18px;
+    border-radius: 0 8px 8px 8px;
+    background: linear-gradient(135deg, #fff7ed, #fef3c7);
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #f59e0b;
+    font-size: .94rem; color: #78350f;
+  }
+  .ans-body.show { display: block; animation: revealAns .22s ease; }
+  .ans-body p { margin: 6px 0; color: #78350f; }
+  .ans-body strong { color: #7c2d12; }
+  .ans-body code:not(pre code) { background: #fde68a; padding: 2px 6px; border-radius: 4px; font-size: .85em; color: #92400e; }
+  .ans-body pre { margin-top: 8px; }
+
+  @keyframes revealAns { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  /* ── Drawer overlay ── */
+  .drawer-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200;
+    opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
   .drawer-overlay.open { opacity: 1; pointer-events: auto; }
 
-  /* ── Drawer ───────────────────────────────────────────────── */
-  .drawer { position: fixed; top: 0; right: 0; width: 260px; height: 100dvh; background: var(--surface); z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .25s ease; box-shadow: -4px 0 20px rgba(0,0,0,.15); }
+  /* ── Drawer ── */
+  .drawer {
+    position: fixed; top: 0; right: 0; width: 260px; height: 100dvh;
+    background: var(--surface); z-index: 201;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform .25s;
+    box-shadow: -4px 0 20px rgba(0,0,0,.15);
+  }
   .drawer.open { transform: translateX(0); }
-  .drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--primary); color: white; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
-  .drawer-close { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; line-height: 1; padding: 4px; border-radius: 4px; }
+  .drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; background: var(--primary); color: white;
+    font-weight: 700; flex-shrink: 0;
+  }
+  .drawer-close {
+    background: none; border: none; color: white;
+    font-size: 1.2rem; cursor: pointer; padding: 4px; border-radius: 4px;
+  }
   .drawer-close:hover { background: rgba(255,255,255,.2); }
-  .drawer-list { list-style: none; padding: 10px 0; overflow-y: auto; flex: 1; }
-  .drawer-list li button { width: 100%; text-align: left; padding: 13px 20px; background: none; border: none; cursor: pointer; font-size: .92rem; font-weight: 500; color: var(--text); border-left: 4px solid transparent; transition: all .15s; }
-  .drawer-list li button:hover { background: var(--primary-light); color: var(--primary); }
-  .drawer-list li button.active { color: var(--primary); border-left-color: var(--primary); background: var(--primary-light); font-weight: 700; }
+  .drawer-list { list-style: none; padding: 8px 0; overflow-y: auto; flex: 1; }
 
-  /* ── RWD：手機版 ──────────────────────────────────────────── */
+  /* Drawer group header */
+  .dg-btn {
+    width: 100%; text-align: left; padding: 13px 20px;
+    background: none; border: none; cursor: pointer;
+    font-size: .95rem; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; justify-content: space-between;
+    border-left: 4px solid transparent; transition: all .15s; font-family: inherit;
+  }
+  .dg-btn:hover { background: var(--primary-light); color: var(--primary); }
+  .dg-btn.group-active { color: var(--primary); border-left-color: var(--primary); background: var(--primary-light); }
+  .dg-btn .g-arrow { font-size: .8rem; transition: transform .22s; }
+  .dg-btn.expanded .g-arrow { transform: rotate(90deg); }
+
+  /* Drawer sub list */
+  .dg-sub { list-style: none; display: none; }
+  .dg-sub.open { display: block; }
+
+  .ds-btn {
+    width: 100%; text-align: left; padding: 9px 20px 9px 34px;
+    background: none; border: none; cursor: pointer;
+    font-size: .88rem; font-weight: 500; color: var(--text-muted);
+    border-left: 3px solid transparent; transition: all .15s; font-family: inherit;
+  }
+  .ds-btn:hover { background: var(--primary-light); color: var(--primary); }
+  .ds-btn.active {
+    color: var(--primary); border-left-color: var(--primary);
+    background: var(--primary-light); font-weight: 700;
+  }
+
+  /* ── Back top ── */
+  .back-top {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 44px; height: 44px; background: var(--primary); color: white;
+    border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37,99,235,.4);
+    display: none; align-items: center; justify-content: center;
+  }
+  .back-top.show { display: flex; }
+  .back-top:hover { background: var(--primary-dark); }
+
+  /* ── RWD ── */
   @media (max-width: 768px) {
-    .site-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .header-text { flex: 1; min-width: 0; }
+    .nav-wrap { display: none; }
     .hamburger { display: flex; }
-    .tab-bar { display: none; }
-    .tab-pane { padding: 24px 16px 80px; }
+    #contentPane { padding: 24px 16px 80px; }
     .md-body h1, .md-body h2, .md-body h3, .md-body h4 { scroll-margin-top: 88px; }
+    .test-toolbar { top: var(--header-h); }
   }
 </style>
 </head>
@@ -109,52 +276,67 @@
   <button class="hamburger" id="hamburgerBtn" aria-label="開啟選單">☰</button>
 </div>
 
-<!-- 遮罩 -->
 <div class="drawer-overlay" id="drawerOverlay"></div>
-
-<!-- 側拉選單 -->
 <nav class="drawer" id="drawer">
   <div class="drawer-header">
     <span>章節目錄</span>
-    <button class="drawer-close" id="drawerClose" aria-label="關閉選單">✕</button>
+    <button class="drawer-close" id="drawerClose" aria-label="關閉">✕</button>
   </div>
   <ul class="drawer-list" id="drawerList"></ul>
 </nav>
 
-<div class="tab-bar" id="tabBar"></div>
+<div class="nav-wrap">
+  <div class="nav-inner" id="navInner"></div>
+</div>
 
+<div id="contentPane"><div class="loading">載入中…</div></div>
 
-<div id="tabContent"></div>
-
-<button class="back-top" id="backTop" onclick="window.scrollTo(0,0)">↑</button>
+<button class="back-top" id="backTop" aria-label="回到頂部">↑</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 <script>
-// ── 章節設定：新增章節只需在這裡加一行 ──────────────────────
-const CHAPTERS = [
-  { title: 'CH1 Basic Concepts',  file: 'textbooks/c1_basic_concepts_notes.md' },
-  { title: 'CH2 AL Fundamentals', file: 'textbooks/c2_assembly_language_fundamentals_notes.md' },
-  { title: 'CH3 Data Transfers',  file: 'textbooks/c3_data_transfers_addressing_arithmetic_notes.md' },
-  { title: 'CH4 Procedures',      file: 'textbooks/c4_procedures_notes.md' },
-  { title: 'CH5 Conditional Processing',      file: 'textbooks/c5_conditional_processing_notes.md' },
-  { title: 'CH6 Integer Arithmetic',      file: 'textbooks/c6_integer_arithmetic_notes.md' },
-  { title: 'CH7 Advanced Procedures',      file: 'textbooks/c7_advanced_procedures_notes.md' },
+
+const NOTES = [
+  { title: 'CH1 Basic Concepts',         file: 'textbooks/c1_basic_concepts_notes.md' },
+  { title: 'CH2 AL Fundamentals',        file: 'textbooks/c2_assembly_language_fundamentals_notes.md' },
+  { title: 'CH3 Data Transfers',         file: 'textbooks/c3_data_transfers_addressing_arithmetic_notes.md' },
+  { title: 'CH4 Procedures',             file: 'textbooks/c4_procedures_notes.md' },
+  { title: 'CH5 Conditional Processing', file: 'textbooks/c5_conditional_processing_notes.md' },
+  { title: 'CH6 Integer Arithmetic',     file: 'textbooks/c6_integer_arithmetic_notes.md' },
+  { title: 'CH7 Advanced Procedures',    file: 'textbooks/c7_advanced_procedures_notes.md' },
 ];
 
-// ── markdown-it 設定 ─────────────────────────────────────────
+const TESTS = [
+  { title: 'CH1 基本概念', file: 'test/ch1_basic_concepts_test.md' },
+  { title: 'CH2 AL 基礎',  file: 'test/ch2_assembly_language_fundamentals_test.md' },
+  { title: 'CH3 資料傳送', file: 'test/ch3_data_transfers_addressing_arithmetic_test.md' },
+  { title: 'CH4 程序',     file: 'test/ch4_procedures_test.md' },
+  { title: 'CH5 條件處理', file: 'test/ch5_conditional_processing_test.md' },
+  { title: 'CH6 整數運算', file: 'test/ch6_integer_arithmetic_test.md' },
+  { title: 'CH7 進階程序', file: 'test/ch7_advanced_procedures_test.md' },
+];
+
+const GROUPS = [
+  { label: '筆記',   key: 'note', items: NOTES },
+  { label: '練習題', key: 'test', items: TESTS },
+];
+
+// ── State ──────────────────────────────────────────────────────────────
+let state = { type: 'note', idx: 0 };
+const cache = new Map();
+
+// ── markdown-it ────────────────────────────────────────────────────────
 const mdParser = window.markdownit({ html: false, linkify: false, typographer: false });
 
 function githubSlugify(str) {
-  // CJK Unified Ideographs: 一-鿿 + Extension A: 㐀-䶿
   const cjk = '\\u4e00-\\u9fff\\u3400-\\u4dbf';
   return str
-    .replace(new RegExp('（[' + cjk + '\\s]+）', 'g'), '')  // 括號內純中文 → 整段移除
-    .replace(/[（）]/g, '')                                   // 剩餘全形括號符號移除（保留內容）
+    .replace(/[（）【】「」]/g, '')
     .toLowerCase()
-    .replace(new RegExp('[^\\w' + cjk + '\\s-]', 'g'), '')  // 移除標點、emoji 等雜訊
+    .replace(new RegExp('[^\\w' + cjk + '\\s-]', 'g'), '')
     .replace(/\s+/g, '-')
-    .replace(/^-+|-+$/g, '');                                // 去掉頭尾多餘的 -
+    .replace(/^-+|-+$/g, '');
 }
 
 mdParser.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
@@ -164,38 +346,267 @@ mdParser.renderer.rules.heading_open = function(tokens, idx, options, env, self)
   return self.renderToken(tokens, idx, options);
 };
 
-// ── 建立 tab 骨架 + drawer 清單 ───────────────────────────────
-const tabBar     = document.getElementById('tabBar');
-const tabContent = document.getElementById('tabContent');
-const drawerList = document.getElementById('drawerList');
+// ── Build desktop nav ──────────────────────────────────────────────────
+const navInner = document.getElementById('navInner');
 
-CHAPTERS.forEach((ch, i) => {
-  // Desktop tab
+GROUPS.forEach(g => {
+  const group = document.createElement('div');
+  group.className = 'nav-group';
+  group.dataset.key = g.key;
+
   const btn = document.createElement('button');
-  btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
-  btn.textContent = ch.title;
-  btn.addEventListener('click', () => switchTab(i));
-  tabBar.appendChild(btn);
+  btn.className = 'nav-btn' + (g.key === state.type ? ' active' : '');
+  btn.innerHTML = `${g.label} <span class="chevron">▼</span>`;
 
-  // Mobile drawer item
-  const li  = document.createElement('li');
-  const dBtn = document.createElement('button');
-  dBtn.className = i === 0 ? 'active' : '';
-  dBtn.textContent = ch.title;
-  dBtn.addEventListener('click', () => switchTab(i));
-  li.appendChild(dBtn);
-  drawerList.appendChild(li);
+  const dropdown = document.createElement('div');
+  dropdown.className = 'nav-dropdown';
 
-  // Content pane
-  const pane = document.createElement('div');
-  pane.className = 'tab-pane' + (i === 0 ? ' active' : '');
-  pane.id = `pane-${i}`;
-  pane.innerHTML = '<div class="loading">載入中…</div>';
-  tabContent.appendChild(pane);
+  g.items.forEach((item, i) => {
+    const dBtn = document.createElement('button');
+    dBtn.className = 'dd-item' + (g.key === state.type && i === state.idx ? ' active' : '');
+    dBtn.textContent = item.title;
+    dBtn.dataset.type = g.key;
+    dBtn.dataset.idx = i;
+    dBtn.addEventListener('click', () => navigate(g.key, i));
+    dropdown.appendChild(dBtn);
+  });
+
+  group.appendChild(btn);
+  group.appendChild(dropdown);
+  navInner.appendChild(group);
+
+  group.addEventListener('mouseenter', () => group.classList.add('open'));
+  group.addEventListener('mouseleave', () => group.classList.remove('open'));
 });
 
-// ── Drawer 開關 ────────────────────────────────────────────────
-const drawer        = document.getElementById('drawer');
+// ── Build mobile drawer ────────────────────────────────────────────────
+const drawerList = document.getElementById('drawerList');
+
+GROUPS.forEach(g => {
+  const li = document.createElement('li');
+
+  const groupBtn = document.createElement('button');
+  groupBtn.className = 'dg-btn' + (g.key === state.type ? ' group-active' : '');
+  groupBtn.dataset.key = g.key;
+  groupBtn.innerHTML = `<span>${g.label}</span><span class="g-arrow">›</span>`;
+
+  const subUl = document.createElement('ul');
+  subUl.className = 'dg-sub';
+  subUl.dataset.key = g.key;
+
+  g.items.forEach((item, i) => {
+    const subLi = document.createElement('li');
+    const subBtn = document.createElement('button');
+    subBtn.className = 'ds-btn' + (g.key === state.type && i === state.idx ? ' active' : '');
+    subBtn.textContent = item.title;
+    subBtn.dataset.type = g.key;
+    subBtn.dataset.idx = i;
+    subBtn.addEventListener('click', () => { navigate(g.key, i); closeMenu(); });
+    subLi.appendChild(subBtn);
+    subUl.appendChild(subLi);
+  });
+
+  groupBtn.addEventListener('click', () => {
+    const expanded = groupBtn.classList.toggle('expanded');
+    subUl.classList.toggle('open', expanded);
+  });
+
+  li.appendChild(groupBtn);
+  li.appendChild(subUl);
+  drawerList.appendChild(li);
+});
+
+// ── Navigate ───────────────────────────────────────────────────────────
+async function navigate(type, idx) {
+  state = { type, idx };
+  window.scrollTo(0, 0);
+  updateActiveStates();
+  updateHeaderSubtitle();
+  await loadContent(type, idx);
+}
+
+function updateActiveStates() {
+  // Desktop nav group active
+  document.querySelectorAll('.nav-group').forEach(g => {
+    g.querySelector('.nav-btn').classList.toggle('active', g.dataset.key === state.type);
+  });
+  // Desktop dropdown items
+  document.querySelectorAll('.dd-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === state.type && +btn.dataset.idx === state.idx);
+  });
+  // Drawer group buttons
+  document.querySelectorAll('.dg-btn').forEach(btn => {
+    btn.classList.toggle('group-active', btn.dataset.key === state.type);
+  });
+  // Drawer sub items
+  document.querySelectorAll('.ds-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === state.type && +btn.dataset.idx === state.idx);
+  });
+}
+
+// ── Load + render ──────────────────────────────────────────────────────
+async function loadContent(type, idx) {
+  const key = `${type}-${idx}`;
+  const pane = document.getElementById('contentPane');
+
+  if (cache.has(key)) {
+    type === 'test' ? renderTestContent(pane, cache.get(key)) : renderNoteContent(pane, cache.get(key));
+    return;
+  }
+
+  pane.innerHTML = '<div class="loading">載入中…</div>';
+  const items = type === 'note' ? NOTES : TESTS;
+  const file = items[idx].file;
+
+  try {
+    const res = await fetch(file);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    cache.set(key, text);
+    type === 'test' ? renderTestContent(pane, cache.get(key)) : renderNoteContent(pane, cache.get(key));
+  } catch (err) {
+    pane.innerHTML = `
+      <div class="error-msg">
+        <strong>無法載入：</strong><code>${file}</code><br><br>
+        請透過 HTTP server 開啟此頁面：<br>
+        <code>npx serve .</code> 或 VS Code Live Server<br><br>
+        錯誤：${err.message}
+      </div>`;
+  }
+}
+
+function renderNoteContent(pane, text) {
+  const body = document.createElement('div');
+  body.className = 'md-body';
+
+  const hotIdx = text.indexOf('# 🔥 速背重點整理');
+  if (hotIdx !== -1) {
+    body.innerHTML = mdParser.render(text.substring(0, hotIdx));
+    const hotDiv = document.createElement('div');
+    hotDiv.className = 'hot-section';
+    hotDiv.innerHTML = mdParser.render(text.substring(hotIdx));
+    body.appendChild(hotDiv);
+  } else {
+    body.innerHTML = mdParser.render(text);
+  }
+
+  pane.innerHTML = '';
+  pane.appendChild(body);
+  pane.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+  bindAnchorLinks(pane);
+}
+
+function renderTestContent(pane, text) {
+  pane.innerHTML = '';
+
+  // Sticky toolbar with expand-all button
+  const toolbar = document.createElement('div');
+  toolbar.className = 'test-toolbar';
+  const expandBtn = document.createElement('button');
+  expandBtn.className = 'expand-all-btn';
+  expandBtn.textContent = '全部展開';
+  toolbar.appendChild(expandBtn);
+  pane.appendChild(toolbar);
+
+  // Split into blocks by --- separator
+  const blocks = text.split('\n\n---\n\n');
+
+  // First block: chapter header (title + meta)
+  const headerDiv = document.createElement('div');
+  headerDiv.className = 'md-body';
+  headerDiv.innerHTML = mdParser.render(blocks[0]);
+  pane.appendChild(headerDiv);
+
+  // Remaining blocks: individual questions
+  const ANSWER_MARKER = '\n\n**答案：**';
+  blocks.slice(1).forEach(block => {
+    if (!block.trim()) return;
+
+    const splitIdx = block.indexOf(ANSWER_MARKER);
+    if (splitIdx === -1) return;
+
+    const qMd  = block.substring(0, splitIdx);
+    const aRest = block.substring(splitIdx + ANSWER_MARKER.length);
+
+    // Card wrapper
+    const card = document.createElement('div');
+    card.className = 'q-card';
+
+    // Question
+    const qDiv = document.createElement('div');
+    qDiv.className = 'md-body';
+    qDiv.innerHTML = mdParser.render(qMd);
+
+    // Toggle button
+    const btn = document.createElement('button');
+    btn.className = 'ans-toggle';
+    btn.innerHTML = '<span class="t-arrow">▸</span><span class="t-label">顯示答案</span>';
+
+    // Answer body
+    const aDiv = document.createElement('div');
+    aDiv.className = 'ans-body';
+    aDiv.innerHTML = mdParser.render('**答案：**' + aRest);
+
+    btn.addEventListener('click', () => {
+      const open = btn.classList.toggle('open');
+      aDiv.classList.toggle('show', open);
+      btn.querySelector('.t-label').textContent = open ? '隱藏答案' : '顯示答案';
+    });
+
+    card.appendChild(qDiv);
+    card.appendChild(btn);
+    card.appendChild(aDiv);
+    pane.appendChild(card);
+  });
+
+  pane.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+  bindAnchorLinks(pane);
+
+  // Expand / collapse all
+  let allExpanded = false;
+  expandBtn.addEventListener('click', () => {
+    allExpanded = !allExpanded;
+    pane.querySelectorAll('.ans-body').forEach(d => d.classList.toggle('show', allExpanded));
+    pane.querySelectorAll('.ans-toggle').forEach(b => {
+      b.classList.toggle('open', allExpanded);
+      b.querySelector('.t-label').textContent = allExpanded ? '隱藏答案' : '顯示答案';
+    });
+    expandBtn.classList.toggle('on', allExpanded);
+    expandBtn.textContent = allExpanded ? '全部收合' : '全部展開';
+  });
+}
+
+function bindAnchorLinks(pane) {
+  pane.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const hash = decodeURIComponent(this.getAttribute('href').slice(1));
+      const target = pane.querySelector('[id="' + CSS.escape(hash) + '"]');
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'instant', block: 'start' });
+      }
+    });
+  });
+}
+
+// ── Header subtitle ────────────────────────────────────────────────────
+function updateHeaderSubtitle() {
+  const el = document.getElementById('headerSubtitle');
+  if (window.innerWidth <= 768) {
+    const items = state.type === 'note' ? NOTES : TESTS;
+    el.textContent = items[state.idx].title;
+  } else {
+    el.textContent = 'Assembly Language — CH1~CH7';
+  }
+}
+
+window.addEventListener('resize', () => {
+  updateHeaderSubtitle();
+  if (window.innerWidth > 768) closeMenu();
+});
+
+// ── Drawer ─────────────────────────────────────────────────────────────
+const drawer = document.getElementById('drawer');
 const drawerOverlay = document.getElementById('drawerOverlay');
 
 function openMenu() {
@@ -213,99 +624,15 @@ document.getElementById('hamburgerBtn').addEventListener('click', openMenu);
 document.getElementById('drawerClose').addEventListener('click', closeMenu);
 drawerOverlay.addEventListener('click', closeMenu);
 
-// ── Header 副標題（手機：顯示目前章節，桌面：固定文字） ────────
-function updateHeaderSubtitle(idx) {
-  const el = document.getElementById('headerSubtitle');
-  el.textContent = window.innerWidth <= 768
-    ? CHAPTERS[idx].title
-    : 'Assembly Language — CH1~CH5';
-}
-
-window.addEventListener('resize', () => {
-  // 視窗放大超過斷點時還原副標題並關閉選單
-  const currentIdx = [...document.querySelectorAll('.tab-btn')].findIndex(b => b.classList.contains('active'));
-  updateHeaderSubtitle(currentIdx >= 0 ? currentIdx : 0);
-  if (window.innerWidth > 768) closeMenu();
-});
-
-// ── fetch + 渲染 ──────────────────────────────────────────────
-async function loadChapter(idx) {
-  const pane = document.getElementById(`pane-${idx}`);
-  if (pane.dataset.loaded) return;
-
-  try {
-    const res = await fetch(CHAPTERS[idx].file);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const md = await res.text();
-    renderMarkdown(pane, md);
-    pane.dataset.loaded = '1';
-  } catch (err) {
-    pane.innerHTML = `
-      <div class="error-msg">
-        <strong>無法載入：</strong><code>${CHAPTERS[idx].file}</code><br><br>
-        請透過 HTTP server 開啟此頁面：<br>
-        <code>npx serve .</code> 或 VS Code Live Server<br><br>
-        錯誤：${err.message}
-      </div>`;
-  }
-}
-
-function renderMarkdown(pane, md) {
-  const body = document.createElement('div');
-  body.className = 'md-body';
-
-  const hotIdx = md.indexOf('# 🔥 速背重點整理');
-  if (hotIdx !== -1) {
-    body.innerHTML = mdParser.render(md.substring(0, hotIdx));
-    const hotDiv = document.createElement('div');
-    hotDiv.className = 'hot-section';
-    hotDiv.innerHTML = mdParser.render(md.substring(hotIdx));
-    body.appendChild(hotDiv);
-  } else {
-    body.innerHTML = mdParser.render(md);
-  }
-
-  pane.innerHTML = '';
-  pane.appendChild(body);
-  pane.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
-  bindAnchorLinks(pane);
-}
-
-// ── 錨點連結攔截：限定在當前 active pane 內搜尋，解決跨章節重複 ID 問題 ──
-function bindAnchorLinks(pane) {
-  pane.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', function(e) {
-      // markdown-it 可能對 href 做 URL encode，先 decode 回原始字串
-      const hash = decodeURIComponent(this.getAttribute('href').slice(1));
-      const activePane = document.querySelector('.tab-pane.active');
-      const target = activePane.querySelector('[id="' + CSS.escape(hash) + '"]');
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'instant', block: 'start' });
-      }
-    });
-  });
-}
-
-// ── tab 切換 ──────────────────────────────────────────────────
-function switchTab(idx) {
-  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
-  document.querySelectorAll('.tab-pane').forEach((p, i) => p.classList.toggle('active', i === idx));
-  // 同步更新 drawer 清單的 active 狀態
-  document.querySelectorAll('.drawer-list li button').forEach((b, i) => b.classList.toggle('active', i === idx));
-  window.scrollTo(0, 0);
-  closeMenu();
-  updateHeaderSubtitle(idx);
-  loadChapter(idx);
-}
-
-// ── 回到頂部 ──────────────────────────────────────────────────
+// ── Back top ───────────────────────────────────────────────────────────
 window.addEventListener('scroll', () => {
   document.getElementById('backTop').classList.toggle('show', window.scrollY > 300);
 });
+document.getElementById('backTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-// ── 初始載入 ──────────────────────────────────────────────────
-loadChapter(0);
+// ── Init ───────────────────────────────────────────────────────────────
+navigate('note', 0);
+
 </script>
 </body>
 </html>
