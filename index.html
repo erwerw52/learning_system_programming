@@ -316,6 +316,7 @@ const TESTS = [
   { title: 'CH5 條件處理', file: 'test/ch5_conditional_processing_test.md' },
   { title: 'CH6 整數運算', file: 'test/ch6_integer_arithmetic_test.md' },
   { title: 'CH7 進階程序', file: 'test/ch7_advanced_procedures_test.md' },
+  { title: '模擬測驗',     file: 'test/mock_exam.md' },
 ];
 
 const GROUPS = [
@@ -519,7 +520,7 @@ function renderTestContent(pane, text) {
   pane.appendChild(headerDiv);
 
   // Remaining blocks: individual questions
-  const ANSWER_MARKER = '\n\n**答案：**';
+  const ANSWER_MARKER = '\n\n**答案';
   blocks.slice(1).forEach(block => {
     if (!block.trim()) return;
 
@@ -527,7 +528,7 @@ function renderTestContent(pane, text) {
     if (splitIdx === -1) return;
 
     const qMd  = block.substring(0, splitIdx);
-    const aRest = block.substring(splitIdx + ANSWER_MARKER.length);
+    const aMd  = block.substring(splitIdx).trim();
 
     // Card wrapper
     const card = document.createElement('div');
@@ -546,7 +547,7 @@ function renderTestContent(pane, text) {
     // Answer body
     const aDiv = document.createElement('div');
     aDiv.className = 'ans-body';
-    aDiv.innerHTML = mdParser.render('**答案：**' + aRest);
+    aDiv.innerHTML = mdParser.render(aMd);
 
     btn.addEventListener('click', () => {
       const open = btn.classList.toggle('open');
